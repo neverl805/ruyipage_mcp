@@ -36,7 +36,7 @@ git clone https://github.com/LoseNine/ruyipage-mcp.git
 cd ruyipage-mcp
 pip install -e .
 ```
-
+也可以直接把github连接给ai，让ai帮你装
 ---
 
 ## 配置
@@ -54,12 +54,6 @@ pip install -e .
     }
   }
 }
-```
-
-**方式二：** CLI 注册（用户级）
-
-```bash
-claude mcp add --scope user ruyipage python -- -m ruyipage_mcp
 ```
 
 ### Cursor / 其他 MCP 客户端

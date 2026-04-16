@@ -16,7 +16,7 @@ pip install -e .
 python -m ruyipage_mcp
 
 # Register with Claude Code
-claude mcp add --scope user ruyipage python -- -m ruyipage_mcp
+claude mcp add --scope user -- ruyipage python -m ruyipage_mcp
 ```
 
 There are no tests, linters, or CI configured yet.
