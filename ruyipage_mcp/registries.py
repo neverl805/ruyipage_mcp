@@ -81,7 +81,7 @@ class ElementRegistry(object):
 # ---------------------------------------------------------------------------
 
 class SessionEntry(object):
-    __slots__ = ("page", "owned", "created_at", "last_used_at", "elements")
+    __slots__ = ("page", "owned", "created_at", "last_used_at", "elements", "_collectors")
 
     def __init__(self, page, owned=True):
         self.page = page
@@ -90,6 +90,7 @@ class SessionEntry(object):
         self.created_at = now
         self.last_used_at = now
         self.elements = ElementRegistry()
+        self._collectors = {}
 
     def touch(self):
         self.last_used_at = time.time()

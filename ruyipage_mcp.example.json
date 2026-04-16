@@ -1,0 +1,9 @@
+{
+  "browser_path": "E:\\ruyi_firefox\\firefox.exe",
+  "disable_run_js": false,
+  "disable_extensions": false,
+  "browser_path_whitelist": [],
+  "max_elements": 512,
+  "event_buffer_size": 500,
+  "wait_timeout_ceiling": 60
+}

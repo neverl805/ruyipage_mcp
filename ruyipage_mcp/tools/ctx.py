@@ -83,6 +83,7 @@ async def ctx_emulation(
     height: int | None = None,
     device_pixel_ratio: float | None = None,
     user_agent: str | None = None,
+    enabled: bool | None = None,
     session_id: str | None = None,
 ) -> str:
     """Configure device emulation.
@@ -99,6 +100,8 @@ async def ctx_emulation(
         height: Viewport height (for apply_mobile_preset).
         device_pixel_ratio: DPR (for apply_mobile_preset).
         user_agent: Custom UA string (for apply_mobile_preset).
+        enabled: Boolean toggle for set_offline (True=offline) and set_javascript (True=enabled).
+                 Defaults to True if omitted.
         session_id: Session (auto-resolved if only one exists).
     """
     try:
@@ -138,16 +141,17 @@ async def ctx_emulation(
             return ok({"mobile_preset": kwargs})
 
         elif op == "set_offline":
-            await run_sync(emu.set_network_offline, True)
-            return ok({"offline": True})
+            flag = enabled if enabled is not None else True
+            await run_sync(emu.set_network_offline, flag)
+            return ok({"offline": flag})
 
         elif op == "set_javascript":
-            enabled = True  # caller can extend
-            await run_sync(emu.set_javascript_enabled, enabled)
-            return ok({"javascript_enabled": enabled})
+            flag = enabled if enabled is not None else True
+            await run_sync(emu.set_javascript_enabled, flag)
+            return ok({"javascript_enabled": flag})
 
         else:
-            return err("unknown op '{}' — use set_geolocation|set_timezone|set_locale|apply_mobile_preset".format(op))
+            return err("unknown op '{}' — use set_geolocation|set_timezone|set_locale|apply_mobile_preset|set_offline|set_javascript".format(op))
     except Exception as e:
         return err(e)
 

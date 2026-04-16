@@ -1,11 +1,50 @@
 # -*- coding: utf-8 -*-
 """state.* tools — screenshots, PDF, cookies, storage."""
 
+import io
 import json as _json
 from mcp.server.fastmcp.utilities.types import Image
 
 from ..app import mcp
 from ..runtime import run_sync, resolve_session, resolve_element, ok, err
+
+
+# Max bytes for inline image (base64 inflates ~33%, keep well under API limits)
+_MAX_INLINE_BYTES = 800_000  # ~800 KB PNG → ~1 MB base64
+_MAX_WIDTH = 1280
+_JPEG_QUALITY = 72
+
+
+def _compress_screenshot(raw_png):
+    """Compress a PNG screenshot: resize if wide, convert to JPEG.
+
+    Returns (bytes, format_str).  Falls back to original PNG on any error.
+    """
+    try:
+        from PIL import Image as PILImage
+
+        img = PILImage.open(io.BytesIO(raw_png))
+
+        # Resize if wider than _MAX_WIDTH (keep aspect ratio)
+        if img.width > _MAX_WIDTH:
+            ratio = _MAX_WIDTH / img.width
+            new_h = int(img.height * ratio)
+            img = img.resize((_MAX_WIDTH, new_h), PILImage.LANCZOS)
+
+        # Convert RGBA → RGB for JPEG
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=_JPEG_QUALITY, optimize=True)
+        jpeg_bytes = buf.getvalue()
+
+        # Only use JPEG if it's actually smaller
+        if len(jpeg_bytes) < len(raw_png):
+            return jpeg_bytes, "jpeg"
+        return raw_png, "png"
+    except Exception:
+        return raw_png, "png"
 
 
 @mcp.tool()
@@ -36,7 +75,23 @@ async def state_screenshot(
             with open(save_to, "wb") as f:
                 f.write(raw)
 
-        return Image(data=raw, format="png")
+        # Compress to stay within API limits
+        data, fmt = _compress_screenshot(raw)
+
+        # If still too large after compression, save to temp file and return path
+        if len(data) > _MAX_INLINE_BYTES:
+            import tempfile, os
+            ext = ".jpg" if fmt == "jpeg" else ".png"
+            fd, tmp_path = tempfile.mkstemp(suffix=ext, prefix="ruyipage_screenshot_")
+            os.write(fd, data)
+            os.close(fd)
+            return ok({
+                "saved_to": tmp_path,
+                "size_bytes": len(data),
+                "message": "Screenshot too large for inline display. Use Read tool to view the file.",
+            })
+
+        return Image(data=data, format=fmt)
     except Exception as e:
         return err(e)
 

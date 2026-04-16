@@ -7,7 +7,7 @@ name = "ruyipage-mcp"
 version = "0.1.0"
 description = "MCP server exposing ruyiPage Firefox automation as Claude Code tools."
 readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = "BSD-3-Clause"
 authors = [
   { name = "ruyiPage" }
@@ -29,6 +29,7 @@ classifiers = [
 dependencies = [
   "ruyiPage>=1.1.0",
   "mcp>=1.0",
+  "Pillow>=9.0",
 ]
 
 [project.urls]

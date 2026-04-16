@@ -225,16 +225,13 @@ async def net_collector(
             dt = [d.strip() for d in (data_types or "response").split(",")]
             collector = await run_sync(page.network.add_data_collector, ev, data_types=dt)
             cid = str(id(collector))
-            # Store collector on session entry for later retrieval
-            if not hasattr(entry, "_collectors"):
-                entry._collectors = {}
             entry._collectors[cid] = collector
             return ok({"collector_id": cid})
 
         elif op == "get":
             if not request_id:
                 return err("'request_id' required for op='get'")
-            collectors = getattr(entry, "_collectors", {})
+            collectors = entry._collectors
             if not collectors:
                 return err("no active collector — call net_collector(op='add') first")
             # Try each collector
@@ -248,14 +245,13 @@ async def net_collector(
             return ok(None, message="no data found for request_id '{}'".format(request_id))
 
         elif op == "remove":
-            collectors = getattr(entry, "_collectors", {})
+            collectors = entry._collectors
             for cid, collector in list(collectors.items()):
                 try:
                     await run_sync(collector.remove)
                 except Exception:
                     pass
-            if hasattr(entry, "_collectors"):
-                entry._collectors.clear()
+            entry._collectors.clear()
             return ok({"removed": True})
 
         else:

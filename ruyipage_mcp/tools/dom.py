@@ -83,7 +83,7 @@ async def dom_read(
 
     Args:
         element_id: Element handle returned by dom_find / dom_find_all.
-        what: One of "text", "html", "outer_html", "value", "attrs", "rect", "all".
+        what: One of "text", "html", "inner_html", "outer_html", "value", "attrs", "rect", "all".
         session_id: Session (auto-resolved if only one exists).
     """
     try:
@@ -93,10 +93,10 @@ async def dom_read(
 
         if what == "text":
             return ok(await run_sync(lambda: ele.text))
-        elif what == "html":
+        elif what == "html" or what == "outer_html":
             return ok(await run_sync(lambda: ele.html))
-        elif what == "outer_html":
-            return ok(await run_sync(lambda: ele.html))
+        elif what == "inner_html":
+            return ok(await run_sync(lambda: ele.inner_html if hasattr(ele, 'inner_html') else ele.html))
         elif what == "value":
             return ok(await run_sync(lambda: ele.value))
         elif what == "attrs":
@@ -117,7 +117,7 @@ async def dom_read(
             data["attrs"] = element_preview(ele)["attrs"]
             return ok(data)
         else:
-            return err("unknown 'what' value: '{}' — use text|html|value|attrs|rect|all".format(what))
+            return err("unknown 'what' value: '{}' — use text|html|inner_html|outer_html|value|attrs|rect|all".format(what))
     except Exception as e:
         return err(e)
 
