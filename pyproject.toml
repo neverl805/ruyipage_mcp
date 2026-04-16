@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ruyipage-mcp"
+version = "0.1.0"
+description = "MCP server exposing ruyiPage Firefox automation as Claude Code tools."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.9"
+license = "BSD-3-Clause"
+authors = [
+  { name = "ruyiPage" }
+]
+keywords = [
+  "mcp",
+  "ruyipage",
+  "firefox",
+  "browser-automation",
+  "claude-code",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Internet :: WWW/HTTP :: Browsers",
+]
+dependencies = [
+  "ruyiPage>=1.1.0",
+  "mcp>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/LoseNine/ruyipage-mcp"
+Repository = "https://github.com/LoseNine/ruyipage-mcp"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["ruyipage_mcp*"]
